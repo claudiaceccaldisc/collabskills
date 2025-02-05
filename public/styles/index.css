@@ -1,0 +1,115 @@
+/* 🎨 Importation des polices */
+@font-face {
+    font-family: 'Poppins';
+    src: url('./fonts/Poppins-Regular.woff2') format('woff2'),
+         url('./fonts/Poppins-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Poppins';
+    src: url('./fonts/Poppins-Bold.woff2') format('woff2'),
+         url('./fonts/Poppins-Bold.woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* 🌆 Image de fond */
+body {
+    font-family: 'CustomFont', Arial, sans-serif;
+    background: url('../images/background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* 📦 Overlay pour centrage */
+.overlay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+/* 📑 Conteneur principal */
+.container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    width: 350px;
+    text-align: center;
+}
+
+/* 🌟 Titre */
+h2 {
+    font-size: 22px;
+    margin-bottom: 15px;
+}
+
+/* 📝 Champs de formulaire */
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* 🔵 Boutons */
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #5A8DEE;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s ease;
+}
+
+button:hover {
+    background-color: #4A7EDB;
+}
+
+/* 🔄 Toggle entre connexion et inscription */
+.toggle-btn {
+    background: none;
+    color: #5A8DEE;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.toggle-btn:hover {
+    color: #4A7EDB;
+}
+
+/* 🔘 Bouton réinitialisation */
+.reset-session {
+    background-color: #6777ef;
+    color: white;
+    width: 300px;
+    text-align: center;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 20px;
+    cursor: pointer;
+}
+
+.reset-session:hover {
+    background-color: #5567D9;
+}
+
+/* 🚫 Cacher le conteneur d'inscription par défaut */
+.hidden {
+    display: none;
+}

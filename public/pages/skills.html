@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Compétences</title>
+    <link rel="stylesheet" href="../styles/skills.css">
+    <script defer src="../js/skills.js"></script>
+</head>
+<body onload="checkAuth()">
+
+    <!-- 🏠 Barre de navigation -->
+    <nav class="navbar">
+        <a href="../index.html">🏠 Accueil</a>
+        <a href="../pages/projects.html">📂 Projets</a>
+        <a href="../pages/settings.html">⚙️ Paramètres</a>
+    </nav>
+
+    <header>
+        <h1>Gestion des Compétences</h1>
+    </header>
+
+    <main>
+        <!-- 📌 Ajout de Compétences -->
+        <section class="card">
+            <h2>Ajout de Compétences</h2>
+            <form id="skillForm">
+                <label for="skillCategory">Catégorie :</label>
+                <select id="skillCategory" required>
+                    <option value="">--Sélectionnez une catégorie--</option>
+                    <option value="Administration et Gestion">Administration et Gestion</option>
+                    <option value="Informatique et Numérique">Informatique et Numérique</option>
+                    <option value="Relation client et Communication">Relation client et Communication</option>
+                    <option value="Logistique et Organisation">Logistique et Organisation</option>
+                    <option value="Formation et Pédagogie">Formation et Pédagogie</option>
+                    <option value="Juridique et Réglementaire">Juridique et Réglementaire</option>
+                    <option value="Analyse et Statistiques">Analyse et Statistiques</option>
+                    <option value="Innovation et Amélioration continue">Innovation et Amélioration continue</option>
+                    <option value="Création et Design">Création et Design</option>
+                    <option value="Maintenance et Sécurité">Maintenance et Sécurité</option>
+                    <option value="Santé et Bien-être au travail">Santé et Bien-être au travail</option>
+                </select>
+
+                <label for="skillName">Nom :</label>
+                <input type="text" id="skillName" maxlength="50" required>
+
+                <button type="submit">Ajouter</button>
+            </form>
+        </section>
+
+        <!-- 📌 Liste des compétences enregistrées -->
+        <section class="card">
+            <h2>Compétences enregistrées par tous les utilisateurs</h2>
+            <ul id="allSkillsList"></ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Gestion des Compétences. Tous droits réservés.</p>
+    </footer>
+
+</body>
+</html>

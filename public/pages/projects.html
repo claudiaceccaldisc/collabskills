@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Projets</title>
+    <link rel="stylesheet" href="../styles/projects.css">
+    <script defer src="../js/projects.js"></script>
+</head>
+<body onload="checkAuth()">
+
+    <h1>Gestion des Projets</h1>
+
+    <nav>
+        <a href="dashboard.html">🏠 Accueil</a> |
+        <a href="skills.html">🎓 Compétences</a> |
+        <a href="settings.html">⚙️ Paramètres</a>
+    </nav>
+
+    <h2>Liste des Projets</h2>
+
+    <!-- Barre de recherche et filtres -->
+    <div class="filters">
+        <input type="text" id="searchInput" placeholder="🔍 Rechercher un projet par nom...">
+        <select id="statusFilter">
+            <option value="all">📌 Tous les statuts</option>
+            <option value="en cours">🟡 En cours</option>
+            <option value="terminé">✅ Terminé</option>
+            <option value="annulé">❌ Annulé</option>
+        </select>
+    </div>
+
+    <!-- Tableau des projets -->
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Statut</th>
+                <th>Échéance</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="projectsTableBody"></tbody>
+    </table>
+
+    <!-- Formulaire d'ajout/modification de projet -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Ajouter un Projet</h2>
+            <form id="projectForm">
+                <input type="hidden" id="projectId">
+                <label>Nom :</label>
+                <input type="text" id="projectName" required>
+                <label>Description :</label>
+                <textarea id="projectDescription" required></textarea>
+                <label>Statut :</label>
+                <select id="projectStatus">
+                    <option value="en cours">🟡 En cours</option>
+                    <option value="terminé">✅ Terminé</option>
+                    <option value="annulé">❌ Annulé</option>
+                </select>
+                <label>Échéance :</label>
+                <input type="date" id="projectDeadline" required>
+                <button type="submit">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <button id="addProjectBtn">➕ Ajouter un Projet</button>
+
+</body>
+</html>

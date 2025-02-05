@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Notifications</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Notifications</h1>
+    <div id="notificationsList"></div>
+
+    <script>
+        function fetchNotifications() {
+            fetch('/api/notifications.php')
+                .then(response => response.json())
+                .then(data => {
+                    let notifDiv = document.getElementById("notificationsList");
+                    notifDiv.innerHTML = "";
+                    data.forEach(notif => {
+                        notifDiv.innerHTML += `<p>${notif.message} <i>${notif.date}</i></p>`;
+                    });
+                });
+        }
+
+        setInterval(fetchNotifications, 5000);
+        fetchNotifications();
+    </script>
+</body>
+</html>

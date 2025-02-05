@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord</title>
+    <link rel="stylesheet" href="../styles/dashboard.css">
+    <script defer src="../js/script.js"></script>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
+        
+        <ul>
+            <li><a href="index.html"><span class="icon">🏠</span><span class="text">Accueil</span></a></li>
+            <li><a href="projects.html"><span class="icon">📁</span><span class="text">Mes Projets</span></a></li>
+            <li><a href="skills.html"><span class="icon">🎓</span><span class="text">Mes Compétences</span></a></li>
+            <li><a href="team.html"><span class="icon">👥</span><span class="text">Mes Collaborateurs</span></a></li>
+            <li><a href="#" onclick="logout()"><span class="icon">🚪</span><span class="text">Déconnexion</span></a></li>
+        </ul>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="main-content">
+        <h1 id="dashboard-title">Bienvenue <span id="userName">Chargement...</span> 👋</h1>
+        <p>Accédez rapidement aux éléments clés de votre travail.</p>
+
+        <!-- Cartes d'information -->
+        <div class="card-container">
+            <div class="card">
+                <h3>📌 Projets en cours</h3>
+                <p id="projectCount">Chargement...</p>
+            </div>
+            <div class="card">
+                <h3>✅ Tâches à faire</h3>
+                <p id="taskCount">Chargement...</p>
+            </div>
+            <div class="card">
+                <h3>👥 Collaborateurs</h3>
+                <p id="teamCount">Chargement...</p>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("../api/auth.php?action=getUser")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById("userName").textContent = `${data.first_name} ${data.last_name}`;
+                    } else {
+                        console.error("Erreur :", data.message);
+                        document.getElementById("userName").textContent = "Utilisateur inconnu";
+                    }
+                })
+                .catch(error => console.error("Erreur de chargement :", error));
+        });
+        </script>
+        
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion & Inscription</title>
+    <link rel="stylesheet" href="styles/index.css">
+</head>
+<body>
+    <div class="overlay">
+        <!-- Conteneur Connexion -->
+        <div class="container" id="loginContainer">
+            <h2>Connexion</h2>
+            <form id="loginForm">
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="password" placeholder="Mot de passe" required>
+                <button type="submit">Se connecter</button>
+            </form>
+            <p id="loginMessage"></p>
+            <p>Pas encore de compte ? <button class="toggle-btn" id="showRegister">Créer un compte</button></p>
+        </div>
+
+        <!-- Conteneur Inscription -->
+        <div class="container hidden" id="registerContainer">
+            <h2>Créer un Compte</h2>
+            <form id="registerForm">
+                <input type="text" id="first_name" placeholder="Prénom" required>
+                <input type="text" id="last_name" placeholder="Nom" required>
+                <input type="email" id="reg_email" placeholder="Email" required>
+                <input type="password" id="reg_password" placeholder="Mot de passe" required>
+                <button type="submit">S'inscrire</button>
+            </form>
+            <p id="registerMessage"></p>
+            <button class="toggle-btn" id="backToLogin">Retour</button>
+        </div>
+
+        <!-- Bouton Réinitialiser Session -->
+        <button class="reset-session" onclick="localStorage.clear(); location.reload();">Réinitialiser session</button>
+    </div>
+
+    <script src="js/script.js"></script>
+
+</body>
+</html>

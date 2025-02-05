@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+    <script src="../script.js"></script>
+</head>
+<body>
+    <div id="chatbox"></div>
+    <input type="text" id="message" placeholder="Écris un message...">
+    <button onclick="sendMessage()">Envoyer</button>
+
+    <script>
+        function fetchMessages() {
+            fetch('/api/chat.php')
+                .then(response => response.json())
+                .then(data => {
+                    let chatbox = document.getElementById("chatbox");
+                    chatbox.innerHTML = "";
+                    data.forEach(msg => {
+                        chatbox.innerHTML += `<p><strong>${msg.first_name}:</strong> ${msg.message} <i>${msg.created_at}</i></p>`;
+                    });
+                });
+        }
+
+        function sendMessage() {
+            let message = document.getElementById("message").value;
+            fetch('/api/chat.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ user_id: 1, message })
+            }).then(() => fetchMessages());
+        }
+
+        setInterval(fetchMessages, 5000);
+        fetchMessages();
+    </script>
+</body>
+</html>
