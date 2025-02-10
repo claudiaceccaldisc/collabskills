@@ -1,0 +1,74 @@
+/* ====== sidebar.css ====== */
+
+/* Sidebar toujours visible et fixée à gauche */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;           /* Largeur étendue par défaut */
+    height: 100vh;
+    background: #5A8DEE;
+    color: white;
+    padding: 20px 0;        /* Espace vertical interne */
+    transition: width 0.3s ease;
+    z-index: 1000;
+}
+
+/* Lorsque la sidebar est réduite (classe collapsed), sa largeur passe à 80px */
+.sidebar.collapsed {
+    width: 80px;
+}
+
+/* Bouton toggle placé à l'intérieur de la sidebar, centré en haut */
+.toggle-sidebar {
+    display: block;
+    margin: 0 auto 20px auto;  /* Centré horizontalement */
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+}
+
+/* Menu de navigation */
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;  /* Aligner le contenu à gauche */
+    padding-left: 15px;
+}
+
+.sidebar ul li a {
+    color: white !important;
+    text-decoration: none;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Masquer le texte de la navigation en mode réduit */
+.sidebar.collapsed ul li a .text {
+    display: none;
+}
+
+/* ===== Responsive pour la sidebar ===== */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 80px;
+    }
+    .sidebar ul li a .text {
+        display: none;
+    }
+    /* Désactiver le bouton toggle lorsque l'écran est trop petit */
+    .toggle-sidebar {
+        pointer-events: none;
+    }
+}

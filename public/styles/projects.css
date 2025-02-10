@@ -1,21 +1,21 @@
 /* 🎨 Importation des polices */
 @font-face {
     font-family: 'Poppins';
-    src: url('./fonts/Poppins-Regular.woff2') format('woff2'),
-         url('./fonts/Poppins-Regular.woff') format('woff');
+    src: url('../fonts/Poppins-Regular.woff2') format('woff2'),
+         url('../fonts/Poppins-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Poppins';
-    src: url('./fonts/Poppins-Bold.woff2') format('woff2'),
-         url('./fonts/Poppins-Bold.woff');
+    src: url('../fonts/Poppins-Bold.woff2') format('woff2'),
+         url('../fonts/Poppins-Bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
 }
 
-/* 🌆 Fond et structure globale */
+/* 🌆 Fond et structure globale pour la page projets */
 body {
     font-family: 'Poppins', Arial, sans-serif;
     background-color: #FAF3E0;
@@ -23,7 +23,19 @@ body {
     padding: 20px;
 }
 
-/* 📌 Titre principal */
+/* Zone de contenu principale */
+.main-content {
+    margin-left: 250px; /* Sidebar étendue */
+    width: calc(100% - 250px);
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.sidebar.collapsed ~ .main-content {
+    margin-left: 80px; /* Sidebar réduite */
+    width: calc(100% - 80px);
+}
+
+/* Titres et filtres */
 h1 {
     text-align: center;
     color: #333;
@@ -31,28 +43,6 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* 📌 Barre de navigation */
-nav {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-nav a {
-    text-decoration: none;
-    font-weight: bold;
-    padding: 8px 15px;
-    border-radius: 5px;
-    margin: 0 5px;
-    color: #007bff;
-    transition: background 0.3s ease-in-out;
-}
-
-nav a:hover {
-    background: #007bff;
-    color: white;
-}
-
-/* 📌 Filtres */
 .filters {
     display: flex;
     justify-content: space-between;
@@ -70,7 +60,7 @@ nav a:hover {
     width: 48%;
 }
 
-/* 📌 Bouton Ajouter */
+/* Bouton Ajouter */
 #addProjectBtn {
     background: #4a90e2;
     color: white;
@@ -86,7 +76,7 @@ nav a:hover {
     background: #357ABD;
 }
 
-/* 📌 Tableau des projets */
+/* Tableau des projets */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -108,17 +98,21 @@ th {
     font-weight: bold;
 }
 
-/* 📌 Actions */
+/* Boutons */
 button {
-    padding: 8px 12px;
+    background: #ff5e62;
+    color: white;
     border: none;
-    border-radius: 5px;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 12px;
     cursor: pointer;
-    font-size: 14px;
+    transition: background 0.3s ease-in-out;
 }
 
 button:hover {
-    opacity: 0.8;
+    background: #ff3b3b;
 }
 
 button.edit {
@@ -131,7 +125,7 @@ button.delete {
     color: white;
 }
 
-/* 📌 MODAL STYLISÉ AVEC COULEURS PASTELS */
+/* Modal */
 .modal {
     display: none;
     position: fixed;
@@ -147,7 +141,6 @@ button.delete {
     animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Animation douce lors de l'ouverture */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -159,38 +152,12 @@ button.delete {
     }
 }
 
-/* 📌 EN-TÊTE DU MODAL */
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 18px;
-    font-weight: bold;
-    color: #4a4a4a;
-}
-
-/* 📌 Bouton de fermeture */
-.close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 22px;
-    cursor: pointer;
-    color: #e74c3c;
-}
-
-.close:hover {
-    opacity: 0.8;
-}
-
-/* 📌 FORMULAIRE DANS LE MODAL */
 .modal-content {
     background: #FAD4B7;
     padding: 20px;
     border-radius: 10px;
 }
 
-/* 📌 CHAMPS DE FORMULAIRE */
 .modal-content input, 
 .modal-content select, 
 .modal-content textarea {
@@ -204,7 +171,6 @@ button.delete {
     transition: all 0.3s ease-in-out;
 }
 
-/* Effet sur les inputs */
 .modal-content input:focus,
 .modal-content select:focus,
 .modal-content textarea:focus {
@@ -212,7 +178,17 @@ button.delete {
     background: #e6f2ff;
 }
 
-/* 📌 BOUTON D'ENREGISTREMENT */
+/* Bouton de fermeture du modal */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 22px;
+    color: #e74c3c;
+    cursor: pointer; /* Ajout du curseur pointer pour la croix */
+}
+
+/* Bouton d'enregistrement dans le modal */
 #saveProjectBtn {
     background: #27ae60;
     color: white;
@@ -230,18 +206,14 @@ button.delete {
     background: #219150;
 }
 
-/* 📌 RESPONSIVE (Mobile) */
+/* Responsive (Mobile)*/
 @media (max-width: 768px) {
-    .filters {
-        flex-direction: column;
+    .main-content {
+        margin-left: 250px;           /* Si la sidebar est étendue */
+        width: calc(100% - 250px);
     }
-
-    .filters input, .filters select {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .modal {
-        width: 90%;
+    .sidebar.collapsed ~ .main-content {
+        margin-left: 80px;            /* Si la sidebar est réduite */
+        width: calc(100% - 80px);
     }
 }

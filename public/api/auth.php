@@ -1,8 +1,8 @@
 <?php
 require __DIR__ . '/config.php';
 
-session_start();
-if (!isset($_SESSION)) {
+// Démarrer la session si elle n'est pas déjà démarrée
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 error_log("SESSION: " . print_r($_SESSION, true)); // Vérification des valeurs en session
@@ -25,9 +25,9 @@ if (!$action) {
 // 📝 Gérer l'inscription
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'register') {
     $first_name = trim($input['first_name'] ?? '');
-    $last_name = trim($input['last_name'] ?? '');
-    $email = trim($input['email'] ?? '');
-    $password = trim($input['password'] ?? '');
+    $last_name  = trim($input['last_name'] ?? '');
+    $email      = trim($input['email'] ?? '');
+    $password   = trim($input['password'] ?? '');
 
     if (empty($first_name) || empty($last_name) || empty($email) || empty($password)) {
         echo json_encode(["error" => "Tous les champs sont requis"]);
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'register') {
 
 // 🔑 Gérer la connexion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'login') {
-    $email = trim($input['email'] ?? '');
+    $email    = trim($input['email'] ?? '');
     $password = trim($input['password'] ?? '');
 
     if (empty($email) || empty($password)) {
@@ -74,19 +74,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'login') {
         exit;
     }
 
-    // Démarrer une session et stocker l'utilisateur
-    $_SESSION['user_email'] = $email;
+    // Stocker les informations de l'utilisateur dans la session
+    $_SESSION['user_id']         = $user['id'];
+    $_SESSION['user_email']      = $email;
     $_SESSION['user_first_name'] = $user['first_name'];
-    $_SESSION['user_last_name'] = $user['last_name'];
+    $_SESSION['user_last_name']  = $user['last_name'];
 
     // Générer un token simple (idéalement JWT, mais ici basique)
     $token = bin2hex(random_bytes(16));
 
     echo json_encode([
-        "message" => "Connexion réussie",
-        "token" => $token,
+        "message"    => "Connexion réussie",
+        "token"      => $token,
         "first_name" => $user['first_name'],
-        "last_name" => $user['last_name']
+        "last_name"  => $user['last_name']
     ]);
     exit;
 }
@@ -99,10 +100,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && $action === 'getUser') {
     }
 
     echo json_encode([
-        "success" => true,
-        "email" => $_SESSION['user_email'],
+        "success"    => true,
+        "email"      => $_SESSION['user_email'],
         "first_name" => $_SESSION['user_first_name'],
-        "last_name" => $_SESSION['user_last_name']
+        "last_name"  => $_SESSION['user_last_name']
     ]);
     exit;
 }

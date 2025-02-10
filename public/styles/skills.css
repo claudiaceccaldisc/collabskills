@@ -1,16 +1,16 @@
 /* 🎨 Importation des polices */
 @font-face {
     font-family: 'Poppins';
-    src: url('/fonts/Poppins-Regular.woff2') format('woff2'),
-         url('/fonts/Poppins-Regular.woff') format('woff');
+    src: url('../fonts/Poppins-Regular.woff2') format('woff2'),
+         url('../fonts/Poppins-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Poppins';
-    src: url('/fonts/Poppins-Bold.woff2') format('woff2'),
-         url('/fonts/Poppins-Bold.woff');
+    src: url('../fonts/Poppins-Bold.woff2') format('woff2'),
+         url('../fonts/Poppins-Bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
 }
@@ -26,36 +26,29 @@ body {
     align-items: center;
 }
 
-/* 📌 Navigation */
-.navbar {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 10px;
-    background: linear-gradient(to right, #ffecd2, #fcb69f);
-    border-bottom: 2px solid #ff5e62; 
-    border-radius: 10px;
-}
-
-.navbar a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-}
-
-
-
-/* 📌 Conteneur principal */
-.container {
+/* Contenu principal spécifique à la page Skills */
+.main-content {
     width: 90%;
     max-width: 800px;
+    margin-left: 250px;  /* Marge correspondant à la sidebar étendue */
+    transition: margin-left 0.3s ease;
+}
+
+/* Ajustement de la marge quand la sidebar est réduite */
+.sidebar.collapsed ~ .main-content {
+    margin-left: 80px;
+}
+
+/* Conteneur pour le contenu */
+.container {
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 30px;
     margin-top: 30px;
 }
 
-/* 📌 Cartes encadrées */
+/* Cartes */
 .card {
     background: white;
     border-radius: 20px;
@@ -71,7 +64,7 @@ body {
     border-color: #ff5e62;
 }
 
-/* 📌 Titres */
+/* Titres */
 .card h2 {
     font-size: 24px;
     color: #2c3e50;
@@ -79,7 +72,7 @@ body {
     margin-bottom: 15px;
 }
 
-/* 📌 Formulaires */
+/* Formulaires */
 form {
     display: flex;
     flex-direction: column;
@@ -105,15 +98,8 @@ input:focus, select:focus {
     border-color: #ff5e62;
     outline: none;
 }
-#skillName {
-    width: 94%;
-    padding: 12px;
-    border: 3px solid #ccc;
-    border-radius: 10px;
-    font-size: 14px;
-    transition: border 0.3s ease-in-out;
-}
-/* 📌 Boutons stylisés */
+
+/* Boutons */
 button {
     background: #ff5e62;
     color: white;
@@ -130,7 +116,7 @@ button:hover {
     background: #ff3b3b;
 }
 
-/* 📌 Liste des compétences */
+/* Liste des compétences */
 ul {
     list-style: none;
     padding: 0;
@@ -138,7 +124,7 @@ ul {
 }
 
 ul li {
-    background: #ffe3e3;
+    background: #5A8DEE;
     padding: 12px;
     margin-bottom: 8px;
     border-radius: 10px;
@@ -148,7 +134,7 @@ ul li {
     font-size: 14px;
 }
 
-/* ❌ Bouton de suppression */
+/* Bouton de suppression (si utilisé) */
 .delete-btn {
     background: #e74c3c;
     padding: 8px;
@@ -162,12 +148,11 @@ ul li {
     background: #c0392b;
 }
 
-/* 🏆 Responsive */
+/* Responsive */
 @media (max-width: 768px) {
     .container {
         width: 95%;
     }
-
     button {
         width: 100%;
     }

@@ -1,3 +1,5 @@
+/* ====== dashboard.css ====== */
+
 /* 🎨 Importation des polices */
 @font-face {
     font-family: 'Poppins';
@@ -17,72 +19,16 @@
 
 /* 🌆 Style global */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Poppins', Arial, sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
     background-color: #f4f5f7;
 }
 
-/* 🎛️ Sidebar */
-.sidebar {
-    width: 250px;
-    background: #5A8DEE;
-    color: white;
-    height: 100vh;
-    position: fixed;
-    padding-top: 20px;
-    transition: width 0.3s ease-in-out;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* 📌 Bouton ☰ centré */
-.toggle-sidebar {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: white;
-    cursor: pointer;
-    margin-bottom: 20px;
-}
-
-/* 📋 Menu de navigation */
-.sidebar ul {
-    list-style: none;
-    padding: 0;
-    width: 100%;
-    text-align: left;
-}
-
-.sidebar ul li {
-    padding: 15px;
-    display: flex;
-    align-items: center;
-}
-
-.sidebar ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* 🎛️ Sidebar réduite (mobile ou réduite manuellement) */
-.collapsed {
-    width: 80px;
-}
-
-.collapsed ul li a .text {
-    display: none;
-}
-
 /* 📑 Contenu principal */
 .main-content {
-    margin-left: 270px;
+    margin-left: 270px; /* Cette marge suppose que la sidebar occupe 250px + 20px d'espace */
     padding: 20px;
     width: calc(100% - 270px);
     transition: margin-left 0.3s ease-in-out;
@@ -92,12 +38,30 @@ body {
     margin-left: 100px;
     width: calc(100% - 100px);
 }
+/* Boutons */
+button {
+    background: #ff5e62;
+    color: white;
+    border: none;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
 
-/* 🎴 Cartes d'information */
+button:hover {
+    background: #ff3b3b;
+}
+
+/* 🎴 Cartes d'information - disposition en grille à deux colonnes */
 .card-container {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
     margin-top: 20px;
+    justify-items: center;
 }
 
 .card {
@@ -105,28 +69,18 @@ body {
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    width: 30%;
+    width: 90%;
+    max-width: 400px;
     text-align: center;
 }
 
-/* 🔄 Responsive */
+/* 🔄 Responsive pour le contenu (hors sidebar) */
 @media (max-width: 768px) {
-    .sidebar {
-        width: 80px;
-    }
-    .sidebar ul li a .text {
-        display: none;
-    }
     .main-content {
         margin-left: 100px;
         width: calc(100% - 100px);
     }
     .card-container {
-        flex-direction: column;
-        align-items: center;
-    }
-    .card {
-        width: 80%;
-        margin-bottom: 20px;
+        grid-template-columns: 1fr;
     }
 }
