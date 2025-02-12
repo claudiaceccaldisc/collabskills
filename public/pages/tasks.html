@@ -7,6 +7,8 @@
   <!-- Inclusion des styles pour la sidebar et la page Tasks -->
   <link rel="stylesheet" href="../styles/sidebar.css">
   <link rel="stylesheet" href="../styles/tasks.css">
+  <!-- Inclusion de Chart.js via CDN pour le diagramme -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="../js/tasks.js"></script>
 </head>
 <body onload="checkAuth()">
@@ -53,75 +55,72 @@
       <h1>Gestion des Tâches</h1>
     </header>
     <main>
-      <!-- Formulaire d'ajout de tâche présenté sous forme de card design -->
-      <section class="card">
-        <h2><span class="form-icon">📝</span> Ajouter une Tâche</h2>
-        <form id="taskForm">
-          <label for="taskProject">Projet :</label>
-          <select id="taskProject" required>
-            <option value="">--Sélectionnez un projet--</option>
-            <!-- Les options seront ajoutées par JavaScript -->
-          </select>
-
-          <label for="taskTitle">Titre :</label>
-          <input type="text" id="taskTitle" maxlength="100" required>
-
-          <label for="taskDescription">Description :</label>
-          <textarea id="taskDescription" rows="4"></textarea>
-
-          <label for="taskDueDate">Date d'échéance :</label>
-          <input type="date" id="taskDueDate" required>
-
-          <label for="taskStatus">Statut :</label>
-          <select id="taskStatus" required>
-            <option value="à faire">À faire</option>
-            <option value="en cours">En cours</option>
-            <option value="terminé">Terminé</option>
-          </select>
-
-          <button type="submit">Ajouter la Tâche</button>
-        </form>
-      </section>
-
-      <!-- Tableau affichant la dernière tâche par projet -->
+      <!-- Section: Tableau des tâches (en haut) -->
       <section class="card">
         <h2>Vue des Tâches</h2>
-        <table id="tasksTable">
-          <thead>
-            <tr>
-              <th>Projet</th>
-              <th>Dernière Tâche</th>
-            </tr>
-          </thead>
-          <tbody id="tasksTableBody">
-            <!-- Les lignes seront générées par JavaScript -->
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table id="tasksTable">
+            <thead>
+              <tr>
+                <th>Projet</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Date d'échéance</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tasksTableBody">
+              <!-- Lignes générées par JavaScript -->
+            </tbody>
+          </table>
+        </div>
       </section>
+
+      <!-- Section: Formulaire et Diagramme (en bas) -->
+      <div class="bottom-container">
+        <!-- Formulaire d'ajout/édition (colonne de gauche) -->
+        <section class="card form-card">
+          <h2><span class="form-icon">📝</span> <span id="formTitle">Ajouter une Tâche</span></h2>
+          <form id="taskForm">
+            <input type="hidden" id="taskId">
+            <label for="taskProject">Projet :</label>
+            <select id="taskProject" required>
+              <option value="">--Sélectionnez un projet--</option>
+              <!-- Options générées par JavaScript -->
+            </select>
+
+            <label for="taskTitle">Titre :</label>
+            <input type="text" id="taskTitle" maxlength="100" required>
+
+            <label for="taskDescription">Description :</label>
+            <textarea id="taskDescription" rows="4"></textarea>
+
+            <label for="taskDueDate">Date d'échéance :</label>
+            <input type="date" id="taskDueDate" required>
+
+            <label for="taskStatus">Statut :</label>
+            <select id="taskStatus" required>
+              <option value="à faire">À faire</option>
+              <option value="en cours">En cours</option>
+              <option value="terminé">Terminé</option>
+            </select>
+
+            <button type="submit" id="submitButton">Ajouter la Tâche</button>
+            <button type="button" id="cancelEdit" style="display:none;">Annuler</button>
+          </form>
+        </section>
+
+        <!-- Diagramme des tâches (colonne de droite) -->
+        <section class="card chart-card">
+          <h2>Statistiques des Tâches</h2>
+          <canvas id="taskChart"></canvas>
+        </section>
+      </div>
     </main>
     <footer>
       <p>© 2025 Gestion des Tâches. Tous droits réservés.</p>
     </footer>
-  </div>
-
-  <!-- Modal pour le résumé des 5 dernières tâches -->
-  <div id="taskSummaryModal" class="modal">
-    <div class="modal-content summary-content">
-      <span class="close" onclick="closeSummaryModal()">&times;</span>
-      <h2>Résumé des Tâches</h2>
-      <table id="summaryTable">
-        <thead>
-          <tr>
-            <th>Titre</th>
-            <th>Statut</th>
-            <th>Date d'échéance</th>
-          </tr>
-        </thead>
-        <tbody id="summaryTableBody">
-          <!-- Les 5 dernières tâches seront affichées ici -->
-        </tbody>
-      </table>
-    </div>
   </div>
 </body>
 </html>

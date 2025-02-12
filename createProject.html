@@ -1,0 +1,331 @@
+<?php
+// Si le script est lancé en ligne de commande (CLI), on démarre le serveur WebSocket.
+if (php_sapi_name() === 'cli') {
+    require __DIR__ . '/vendor/autoload.php';
+    use Ratchet\MessageComponentInterface;
+    use Ratchet\ConnectionInterface;
+
+    class WhiteboardServer implements MessageComponentInterface {
+        protected $clients;
+        protected $commands = [];
+
+        public function __construct() {
+            $this->clients = new \SplObjectStorage;
+            echo "Whiteboard Server démarré...\n";
+        }
+
+        public function onOpen(ConnectionInterface $conn) {
+            $this->clients->attach($conn);
+            // Envoi de l'historique complet au nouveau client
+            $initMessage = json_encode([
+                'type' => 'init',
+                'commands' => $this->commands
+            ]);
+            $conn->send($initMessage);
+            echo "Connexion ouverte (ID : {$conn->resourceId})\n";
+        }
+
+        public function onMessage(ConnectionInterface $from, $msg) {
+            $data = json_decode($msg, true);
+            if ($data && isset($data['type']) && $data['type'] === 'command' && isset($data['command'])) {
+                $this->commands[] = $data['command'];
+                // Diffuse la commande à tous les autres clients
+                foreach ($this->clients as $client) {
+                    if ($client !== $from) {
+                        $client->send($msg);
+                    }
+                }
+                echo "Commande reçue et diffusée: " . json_encode($data['command']) . "\n";
+            }
+        }
+
+        public function onClose(ConnectionInterface $conn) {
+            $this->clients->detach($conn);
+            echo "Connexion fermée (ID : {$conn->resourceId})\n";
+        }
+
+        public function onError(ConnectionInterface $conn, \Exception $e) {
+            echo "Erreur : {$e->getMessage()}\n";
+            $conn->close();
+        }
+    }
+
+    $port = 8080;
+    $server = Ratchet\Server\IoServer::factory(
+        new Ratchet\Http\HttpServer(
+            new Ratchet\WebSocket\WsServer(
+                new WhiteboardServer()
+            )
+        ),
+        $port
+    );
+
+    echo "Serveur WebSocket en écoute sur le port $port\n";
+    $server->run();
+    exit;
+}
+?>
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau Blanc Collaboratif - WebSocket</title>
+  <style>
+    /* style.css intégré */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+    }
+    h1 {
+      margin: 0;
+    }
+    #toolbar {
+      margin-top: 10px;
+    }
+    #toolbar button {
+      margin-right: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    main {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Tableau Blanc Collaboratif</h1>
+    <div id="toolbar">
+      <button id="addTextBtn">Ajouter Texte</button>
+      <input type="file" id="uploadImage" accept="image/jpeg, image/png" style="display:none;">
+      <button id="uploadImageBtn">Ajouter Image</button>
+      <input type="file" id="uploadDoc" accept=".pdf, .doc, .docx, .xls, .xlsx, .ppt, .pptx" style="display:none;">
+      <button id="uploadDocBtn">Ajouter Document</button>
+      <button id="addRectangleBtn">Rectangle</button>
+      <button id="addSquareBtn">Carré</button>
+      <button id="addCircleBtn">Cercle</button>
+      <button id="addTriangleBtn">Triangle</button>
+      <button id="addEmojiBtn">Ajouter Emoji</button>
+      <button id="downloadBtn">Télécharger</button>
+    </div>
+  </header>
+  <main>
+    <canvas id="whiteboard" width="800" height="600" tabindex="0"></canvas>
+  </main>
+  <script>
+    // script.js intégré
+
+    const canvas = document.getElementById('whiteboard');
+    const ctx = canvas.getContext('2d');
+
+    let commands = []; // Historique des commandes/dessins
+    let currentShape = null;
+    let shapeStart = null;
+
+    // Connexion au serveur WebSocket (assurez-vous que le serveur est lancé via CLI)
+    const ws = new WebSocket('ws://localhost:8080');
+
+    ws.onopen = () => {
+      console.log('Connecté au serveur WebSocket.');
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'init') {
+        commands = data.commands;
+      } else if (data.type === 'command') {
+        commands.push(data.command);
+      }
+      redrawCanvas();
+    };
+
+    ws.onerror = (error) => {
+      console.error('Erreur WebSocket:', error);
+    };
+
+    function sendCommand(cmd) {
+      const message = {
+        type: 'command',
+        command: cmd
+      };
+      ws.send(JSON.stringify(message));
+    }
+
+    function redrawCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      commands.forEach(cmd => {
+        switch (cmd.type) {
+          case 'text':
+            ctx.font = "20px Arial";
+            ctx.fillStyle = "black";
+            ctx.fillText(cmd.text, cmd.x, cmd.y);
+            break;
+          case 'image': {
+            let img = new Image();
+            img.onload = function() {
+              ctx.drawImage(img, cmd.x, cmd.y, cmd.width, cmd.height);
+            }
+            img.src = cmd.src;
+            break;
+          }
+          case 'shape':
+            ctx.beginPath();
+            ctx.strokeStyle = "black";
+            if (cmd.shape === 'rectangle') {
+              ctx.rect(cmd.x, cmd.y, cmd.width, cmd.height);
+            } else if (cmd.shape === 'square') {
+              ctx.rect(cmd.x, cmd.y, cmd.size, cmd.size);
+            } else if (cmd.shape === 'circle') {
+              ctx.arc(cmd.x, cmd.y, cmd.radius, 0, 2 * Math.PI);
+            } else if (cmd.shape === 'triangle') {
+              ctx.moveTo(cmd.x, cmd.y);
+              ctx.lineTo(cmd.x + cmd.width / 2, cmd.y - cmd.height);
+              ctx.lineTo(cmd.x + cmd.width, cmd.y);
+              ctx.closePath();
+            }
+            ctx.stroke();
+            break;
+          case 'emoji':
+            ctx.font = "30px Arial";
+            ctx.fillText(cmd.emoji, cmd.x, cmd.y);
+            break;
+          case 'doc':
+            ctx.fillStyle = "#f0f0f0";
+            ctx.fillRect(cmd.x, cmd.y, 100, 50);
+            ctx.strokeStyle = "#000";
+            ctx.strokeRect(cmd.x, cmd.y, 100, 50);
+            ctx.fillStyle = "#000";
+            ctx.font = "12px Arial";
+            ctx.fillText(cmd.filename, cmd.x + 5, cmd.y + 25);
+            break;
+          default:
+            break;
+        }
+      });
+    }
+
+    // Actions de la barre d'outils
+
+    document.getElementById('addTextBtn').addEventListener('click', function () {
+      let text = prompt("Entrez le texte à ajouter :");
+      if (text) {
+        const cmd = { type: 'text', text: text, x: canvas.width / 2, y: canvas.height / 2 };
+        commands.push(cmd);
+        sendCommand(cmd);
+        redrawCanvas();
+      }
+    });
+
+    document.getElementById('uploadImageBtn').addEventListener('click', function () {
+      document.getElementById('uploadImage').click();
+    });
+    document.getElementById('uploadImage').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          const cmd = { type: 'image', src: evt.target.result, x: 50, y: 50, width: 200, height: 150 };
+          commands.push(cmd);
+          sendCommand(cmd);
+          redrawCanvas();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    document.getElementById('uploadDocBtn').addEventListener('click', function () {
+      document.getElementById('uploadDoc').click();
+    });
+    document.getElementById('uploadDoc').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (file) {
+        const cmd = { type: 'doc', filename: file.name, x: 100, y: 100 };
+        commands.push(cmd);
+        sendCommand(cmd);
+        redrawCanvas();
+      }
+    });
+
+    document.getElementById('addRectangleBtn').addEventListener('click', function () {
+      currentShape = 'rectangle';
+    });
+    document.getElementById('addSquareBtn').addEventListener('click', function () {
+      currentShape = 'square';
+    });
+    document.getElementById('addCircleBtn').addEventListener('click', function () {
+      currentShape = 'circle';
+    });
+    document.getElementById('addTriangleBtn').addEventListener('click', function () {
+      currentShape = 'triangle';
+    });
+
+    canvas.addEventListener('mousedown', function (e) {
+      if (currentShape) {
+        shapeStart = { x: e.offsetX, y: e.offsetY };
+      }
+    });
+    canvas.addEventListener('mouseup', function (e) {
+      if (currentShape && shapeStart) {
+        const shapeEnd = { x: e.offsetX, y: e.offsetY };
+        const cmd = { type: 'shape', shape: currentShape };
+        if (currentShape === 'rectangle') {
+          cmd.x = shapeStart.x;
+          cmd.y = shapeStart.y;
+          cmd.width = shapeEnd.x - shapeStart.x;
+          cmd.height = shapeEnd.y - shapeStart.y;
+        } else if (currentShape === 'square') {
+          const size = Math.min(Math.abs(shapeEnd.x - shapeStart.x), Math.abs(shapeEnd.y - shapeStart.y));
+          cmd.x = shapeStart.x;
+          cmd.y = shapeStart.y;
+          cmd.size = size;
+        } else if (currentShape === 'circle') {
+          const radius = Math.hypot(shapeEnd.x - shapeStart.x, shapeEnd.y - shapeStart.y);
+          cmd.x = shapeStart.x;
+          cmd.y = shapeStart.y;
+          cmd.radius = radius;
+        } else if (currentShape === 'triangle') {
+          cmd.x = shapeStart.x;
+          cmd.y = shapeEnd.y;
+          cmd.width = shapeEnd.x - shapeStart.x;
+          cmd.height = shapeEnd.y - shapeStart.y;
+        }
+        commands.push(cmd);
+        sendCommand(cmd);
+        redrawCanvas();
+        currentShape = null;
+        shapeStart = null;
+      }
+    });
+
+    document.getElementById('addEmojiBtn').addEventListener('click', function () {
+      const emoji = "😀";
+      const cmd = { type: 'emoji', emoji: emoji, x: canvas.width / 2, y: canvas.height / 2 };
+      commands.push(cmd);
+      sendCommand(cmd);
+      redrawCanvas();
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', function () {
+      const link = document.createElement('a');
+      link.download = 'whiteboard.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  </script>
+</body>
+</html>

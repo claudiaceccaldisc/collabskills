@@ -4,9 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestion des Compétences</title>
-  <!-- Inclusion des styles pour la sidebar et pour la page Skills -->
+  <!-- Inclusion des styles pour la sidebar, la page Skills et le mode sombre -->
   <link rel="stylesheet" href="../styles/sidebar.css">
   <link rel="stylesheet" href="../styles/skills.css">
+  <link rel="stylesheet" href="../styles/darkmode.css">
+  <!-- Scripts dédiés -->
+  <script defer src="../js/darkmode.js"></script>
   <script defer src="../js/skills.js"></script>
 </head>
 <body onload="checkAuth()">
@@ -83,12 +86,20 @@
       <!-- Section d'affichage des compétences -->
       <section class="card">
         <h2>Compétences enregistrées par tous les utilisateurs</h2>
+        <!-- Sélecteur de filtre (optionnel) -->
+        <select id="skillFilter">
+          <option value="">Toutes les catégories</option>
+        </select>
         <ul id="allSkillsList"></ul>
       </section>
     </main>
-    <footer>
-      <p>© 2025 Gestion des Compétences. Tous droits réservés.</p>
-    </footer>
   </div>
+    <!-- Bouton de mode sombre -->
+    <button id="darkModeToggle">🌙</button>
+  <footer>
+    <p>© 2025 Gestion des Compétences. Tous droits réservés.</p>
+  </footer>
+  
+
 </body>
 </html>

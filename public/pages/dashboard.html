@@ -6,6 +6,9 @@
   <title>Tableau de Bord</title>
   <link rel="stylesheet" href="../styles/dashboard.css">
   <link rel="stylesheet" href="../styles/sidebar.css">
+  <link rel="stylesheet" href="../styles/darkmode.css">
+  <!-- Inclusion de Chart.js pour le graphique en barres -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script defer src="../js/dashboard.js"></script>
   <script defer src="../js/skills.js"></script>
 </head>
@@ -14,82 +17,74 @@
   <div class="sidebar" id="sidebar">
     <button class="toggle-sidebar" onclick="toggleSidebar()">☰</button>
     <ul>
-      <li>
-        <a href="dashboard.html">
-          <span class="icon">🏠</span>
-          <span class="text">Accueil</span>
-        </a>
-      </li>
-      <li>
-        <a href="projects.html">
-          <span class="icon">📁</span>
-          <span class="text">Mes Projets</span>
-        </a>
-      </li>
-      <li>
-        <a href="tasks.html">
-          <span class="icon">📝</span>
-          <span class="text">Mes Tâches</span>
-        </a>
-      </li>
-      <li>
-        <a href="skills.html">
-          <span class="icon">🎓</span>
-          <span class="text">Mes Compétences</span>
-        </a>
-      </li>
-      <li>
-        <a href="team.html">
-          <span class="icon">👥</span>
-          <span class="text">Mes Collaborateurs</span>
-        </a>
-      </li>
-      <li>
-        <a href="#" onclick="logout()">
-          <span class="icon">🚪</span>
-          <span class="text">Déconnexion</span>
-        </a>
-      </li>
+      <li><a href="dashboard.html"><span class="icon">🏠</span><span class="text">Accueil</span></a></li>
+      <li><a href="projects.html"><span class="icon">📁</span><span class="text">Projets</span></a></li>
+      <li><a href="tasks.html"><span class="icon">📝</span><span class="text">Tâches</span></a></li>
+      <li><a href="skills.html"><span class="icon">🎓</span><span class="text">Compétences</span></a></li>
+      <li><a href="team.html"><span class="icon">👥</span><span class="text">Collaborateurs</span></a></li>
+      <li><a href="#" onclick="logout()"><span class="icon">🚪</span><span class="text">Déconnexion</span></a></li>
     </ul>
   </div>
 
   <!-- Contenu principal -->
   <div class="main-content">
     <h1 id="dashboard-title">Bienvenue <span id="userName">Chargement...</span> 👋</h1>
-    <p>Accédez rapidement aux éléments clés de votre travail.</p>
     
-    <!-- Conteneur des cards -->
-    <div class="card-container">
-      <div class="card" id="projectsCard">
-        <h3>📌 Projets en cours</h3>
-        <div id="projectsContent">Chargement...</div>
+    <div class="dashboard-container">
+      <!-- Grille des 4 cards -->
+      <div class="cards-column">
+        <!-- Card Projets : affiche le dernier projet enregistré -->
+        <div class="card" id="projectsCard">
+          <h3>📌 Projets</h3>
+          <div class="card-content" id="projectsContent">Chargement...</div>
+        </div>
+        <!-- Card Tâches : affiche la dernière tâche enregistrée -->
+        <div class="card" id="tasksCard">
+          <h3>✅ Tâches</h3>
+          <div class="card-content" id="tasksContent">Chargement...</div>
+        </div>
+        <!-- Card Collaborateurs -->
+        <div class="card" id="collaboratorsCard">
+          <h3>👥 Collaborateurs</h3>
+          <div class="card-content" id="collaboratorsContent">Chargement...</div>
+        </div>
+        <!-- Card Compétences -->
+        <div class="card" id="skillsCard">
+          <h3>🛠️ Compétences</h3>
+          <div class="card-content" id="skillsContent">Chargement...</div>
+        </div>
       </div>
-<!-- Extrait de dashboard.html pour les cards Tâches et Compétences -->
-<div class="card" id="tasksCard">
-  <h3>✅ Tâches à faire</h3>
-  <label for="taskFilter">Filtrer par projet :</label>
-  <select id="taskFilter">
-    <option value="">Tous les projets</option>
-    <!-- Options générées dynamiquement -->
-  </select>
-  <div id="tasksContent">Chargement...</div>
-  <button id="toggleTasksBtn" data-showall="false">Voir plus</button>
-</div>
-      <div class="card" id="collaboratorsCard">
-        <h3>👥 Collaborateurs</h3>
-        <div id="collaboratorsContent">Chargement...</div>
-      </div>
-      <div class="card" id="skillsCard">
-        <h3>🛠️ Mes compétences</h3>
-        <label for="skillFilter">Filtrer par catégorie :</label>
-        <select id="skillFilter">
-          <option value="">Toutes les catégories</option>
-          <!-- Options générées dynamiquement -->
-        </select>
-        <div id="skillsContent">Chargement...</div>
-        <button id="toggleSkillsBtn" data-showall="false">Voir plus</button>
+
+      <!-- Boutons d'action -->
+      <div class="buttons-column">
+        <div class="button-row single">
+          <button class="dashboard-button" onclick="location.href='#'">Créer un projet</button>
+        </div>
+        <div class="button-row">
+          <button class="dashboard-button" onclick="location.href='#'">Nouvelle action</button>
+          <button class="dashboard-button" onclick="location.href='#'">Ajouter une tâche</button>
+        </div>
+        <div class="button-row single">
+          <button class="dashboard-button" onclick="location.href='#'">Créer un template</button>
+        </div>
       </div>
     </div>
+
+    <!-- Section Graphique & Photo de profil -->
+    <div class="chart-photo-section">
+      <div class="chart-container">
+        <h2>Statut des Projets (Graphique en barres)</h2>
+        <canvas id="projectStatusChart"></canvas>
+      </div>
+      <div class="photo-container">
+        <div class="photo-frame">
+          <img src="../images/profilFiverr.png" alt="Image de profil" class="profile-picture">
+        </div>
+      </div>
+    </div>
+
+    <!-- Bouton Mode sombre -->
+    <button id="darkModeToggle">🌙</button>
   </div>
 </body>
 </html>

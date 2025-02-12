@@ -1,251 +1,222 @@
-// Variables globales pour stocker l'ensemble des tâches et compétences
+// Variables globales pour stocker les données
+let allProjects = [];
 let allTasks = [];
+let allCollaborators = [];
 let allSkills = [];
+let projectStatusChart; // Instance du graphique en barres
 
 document.addEventListener("DOMContentLoaded", function() {
+    // Chargement initial
     loadUserName();
     loadProjects();
-    loadCollaborators();
     loadTasksData();
+    loadCollaborators();
     loadSkillsData();
+    loadProjectStatusChart();
 
-    // Configure bouton toggle pour la card Tâches
-    const toggleTasksBtn = document.getElementById("toggleTasksBtn");
-    if (toggleTasksBtn) {
-        toggleTasksBtn.setAttribute("data-showall", "false");
-        toggleTasksBtn.addEventListener("click", function () {
-            const showAll = toggleTasksBtn.getAttribute("data-showall") === "true";
-            displayTasks(!showAll);
-            toggleTasksBtn.textContent = !showAll ? "Voir moins" : "Voir plus";
-            toggleTasksBtn.setAttribute("data-showall", (!showAll).toString());
-        });
-    }
-    const taskFilter = document.getElementById("taskFilter");
-    if (taskFilter) {
-        taskFilter.addEventListener("change", function () {
-            displayTasks(false);
-            if (toggleTasksBtn) toggleTasksBtn.setAttribute("data-showall", "false");
+    // Rafraîchissement automatique toutes les 5 secondes
+    setInterval(() => {
+        loadProjects();
+        loadTasksData();
+    }, 5000);
+
+    // Rafraîchissement lors du focus de la fenêtre
+    window.addEventListener("focus", () => {
+        loadProjects();
+        loadTasksData();
+    });
+
+    // Sidebar toggle
+    const sidebarToggleBtn = document.querySelector('.toggle-sidebar');
+    if (sidebarToggleBtn) {
+        sidebarToggleBtn.addEventListener("click", () => {
+            document.getElementById("sidebar").classList.toggle("collapsed");
         });
     }
 
-    // Configure bouton toggle pour la card Compétences
-    const toggleSkillsBtn = document.getElementById("toggleSkillsBtn");
-    if (toggleSkillsBtn) {
-        toggleSkillsBtn.setAttribute("data-showall", "false");
-        toggleSkillsBtn.addEventListener("click", function () {
-            const showAll = toggleSkillsBtn.getAttribute("data-showall") === "true";
-            displaySkills(!showAll);
-            toggleSkillsBtn.textContent = !showAll ? "Voir moins" : "Voir plus";
-            toggleSkillsBtn.setAttribute("data-showall", (!showAll).toString());
-        });
-    }
-    const skillFilter = document.getElementById("skillFilter");
-    if (skillFilter) {
-        skillFilter.addEventListener("change", function () {
-            displaySkills(false);
-            if (toggleSkillsBtn) toggleSkillsBtn.setAttribute("data-showall", "false");
+    // Mode sombre
+    const darkModeToggleBtn = document.getElementById('darkModeToggle');
+    if (darkModeToggleBtn) {
+        darkModeToggleBtn.addEventListener("click", () => {
+            toggleDarkMode();
+            // Recharger le graphique pour actualiser les couleurs en fonction du mode
+            loadProjectStatusChart();
         });
     }
 });
 
-function toggleSidebar() {
-    const sidebar = document.getElementById("sidebar");
-    sidebar.classList.toggle("collapsed");
-}
-
+// Déconnexion
 function logout() {
     fetch("../api/auth.php?action=logout", {
         method: "POST",
         headers: { "Content-Type": "application/json" }
     })
     .then(response => response.json())
-    .then(data => {
-        window.location.href = "../index.html";
-    })
-    .catch(error => {
-        console.error("Erreur lors de la déconnexion :", error);
-        window.location.href = "../index.html";
-    });
+    .then(() => window.location.href = "../index.html")
+    .catch(error => console.error("Erreur lors de la déconnexion :", error));
 }
 
+// Mode sombre
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+}
+
+// Charger le nom de l'utilisateur
 function loadUserName() {
     fetch("../api/auth.php?action=getUser")
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            document.getElementById("userName").textContent = data.first_name + " " + data.last_name;
-        } else {
-            document.getElementById("userName").textContent = "Utilisateur inconnu";
-        }
+        document.getElementById("userName").textContent = data.success ? `${data.first_name} ${data.last_name}` : "Utilisateur inconnu";
     })
     .catch(error => console.error("Erreur de chargement de l'utilisateur :", error));
 }
 
+// Charger le dernier projet et mettre à jour la card Projets
 function loadProjects() {
     fetch("../api/dashboard.php?action=getProjects")
     .then(response => response.json())
     .then(data => {
-        const projectsDiv = document.getElementById("projectsContent");
+        allProjects = data;
         if (Array.isArray(data) && data.length > 0) {
-            projectsDiv.innerHTML = data.map(proj => `<p>${proj.name} - ${proj.status}</p>`).join("");
+            const lastProj = data[0];
+            document.getElementById("projectsContent").innerHTML =
+                `<strong>${lastProj.name}</strong><br>Status: ${lastProj.status}`;
         } else {
-            projectsDiv.textContent = "Aucun projet en cours.";
+            document.getElementById("projectsContent").textContent = "Aucun projet enregistré.";
         }
     })
-    .catch(error => {
-        console.error("Erreur chargement projets :", error);
-        document.getElementById("projectsContent").textContent = "Erreur de chargement.";
-    });
+    .catch(error => console.error("Erreur chargement projets :", error));
 }
 
-function loadCollaborators() {
-    fetch("../api/dashboard.php?action=getCollaborators")
-    .then(response => response.json())
-    .then(data => {
-        const collabDiv = document.getElementById("collaboratorsContent");
-        if (Array.isArray(data) && data.length > 0) {
-            collabDiv.innerHTML = data.map(user => `<p>${user.first_name} ${user.last_name}</p>`).join("");
-        } else {
-            collabDiv.textContent = "Aucun collaborateur trouvé.";
-        }
-    })
-    .catch(error => {
-        console.error("Erreur chargement collaborateurs :", error);
-        document.getElementById("collaboratorsContent").textContent = "Erreur de chargement.";
-    });
-}
-
-/* --- Fonctions pour la card TÂCHES --- */
+// Charger la dernière tâche et mettre à jour la card Tâches
 function loadTasksData() {
     fetch("../api/dashboard.php?action=getTasks")
     .then(response => response.json())
     .then(data => {
         allTasks = data;
-        populateTaskFilter();
-        displayTasks(false);
-    })
-    .catch(error => console.error("Erreur lors du chargement des tâches :", error));
-}
-
-function populateTaskFilter() {
-    const select = document.getElementById("taskFilter");
-    if (!select) return;
-    let projectsSet = new Set();
-    allTasks.forEach(task => {
-        if (task.project_name) {
-            projectsSet.add(task.project_name);
-        }
-    });
-    select.innerHTML = `<option value="">Tous les projets</option>`;
-    projectsSet.forEach(name => {
-        const option = document.createElement("option");
-        option.value = name;
-        option.textContent = name;
-        select.appendChild(option);
-    });
-}
-
-function displayTasks(showAll) {
-    let filtered = allTasks;
-    const filterValue = document.getElementById("taskFilter") ? document.getElementById("taskFilter").value : "";
-    if (filterValue) {
-        filtered = filtered.filter(task => task.project_name === filterValue);
-    }
-    if (!showAll) {
-        filtered = filtered.slice(0, 3);
-    }
-    const tasksContent = document.getElementById("tasksContent");
-    tasksContent.innerHTML = "";
-    if (filtered.length === 0) {
-        tasksContent.innerHTML = "<p>Aucune tâche trouvée.</p>";
-        return;
-    }
-    filtered.forEach(task => {
-        const p = document.createElement("p");
-        p.textContent = `${task.title} - ${task.status}`;
-        p.style.cursor = "pointer";
-        p.addEventListener("click", () => showTaskSummary(task.project_id));
-        tasksContent.appendChild(p);
-    });
-}
-
-/* --- Fonction d'affichage du modal de résumé des tâches --- */
-function showTaskSummary(projectId) {
-    fetch(`../api/dashboard.php?action=getTaskSummary&project_id=${projectId}`)
-    .then(response => response.json())
-    .then(summaryTasks => {
-        const summaryTableBody = document.getElementById("summaryTableBody");
-        summaryTableBody.innerHTML = "";
-        if (Array.isArray(summaryTasks) && summaryTasks.length > 0) {
-            summaryTasks.forEach(task => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${task.title}</td>
-                    <td>${task.status}</td>
-                    <td>${task.due_date}</td>
-                `;
-                summaryTableBody.appendChild(row);
-            });
+        if (Array.isArray(data) && data.length > 0) {
+            const lastTask = data[0];
+            document.getElementById("tasksContent").innerHTML =
+                `<strong>${lastTask.title}</strong><br>Status: ${lastTask.status}<br>Date limite: ${lastTask.due_date}`;
         } else {
-            summaryTableBody.innerHTML = "<tr><td colspan='3'>Aucune tâche en cours ou à faire.</td></tr>";
+            document.getElementById("tasksContent").textContent = "Aucune tâche enregistrée.";
         }
-        document.getElementById("taskSummaryModal").style.display = "block";
     })
-    .catch(error => console.error("Erreur lors du chargement du résumé des tâches :", error));
+    .catch(error => console.error("Erreur chargement tâches :", error));
 }
 
-function closeSummaryModal() {
-    document.getElementById("taskSummaryModal").style.display = "none";
+// Charger les collaborateurs et mettre à jour la card Collaborateurs
+function loadCollaborators() {
+    fetch("../api/dashboard.php?action=getCollaborators")
+    .then(response => response.json())
+    .then(data => {
+        allCollaborators = data;
+        if (Array.isArray(data) && data.length > 0) {
+            const lastCollab = data[0];
+            document.getElementById("collaboratorsContent").innerHTML =
+                `<strong>${lastCollab.first_name} ${lastCollab.last_name}</strong>`;
+        } else {
+            document.getElementById("collaboratorsContent").textContent = "Aucun collaborateur trouvé.";
+        }
+    })
+    .catch(error => console.error("Erreur chargement collaborateurs :", error));
 }
 
-/* --- Fonctions pour la card COMPÉTENCES --- */
+// Charger les compétences et mettre à jour la card Compétences
 function loadSkillsData() {
     fetch("../api/dashboard.php?action=getSkills")
     .then(response => response.json())
     .then(data => {
         allSkills = data;
-        populateSkillFilter();
-        displaySkills(false);
-    })
-    .catch(error => console.error("Erreur lors du chargement des compétences :", error));
-}
-
-function populateSkillFilter() {
-    const select = document.getElementById("skillFilter");
-    if (!select) return;
-    let categories = new Set();
-    allSkills.forEach(skill => {
-        if (skill.category) {
-            categories.add(skill.category);
+        if (Array.isArray(data) && data.length > 0) {
+            const lastSkill = data[0];
+            document.getElementById("skillsContent").innerHTML =
+                `<strong>${lastSkill.skill_name}</strong><br>Catégorie: ${lastSkill.category}`;
+        } else {
+            document.getElementById("skillsContent").textContent = "Aucune compétence trouvée.";
         }
-    });
-    select.innerHTML = `<option value="">Toutes les catégories</option>`;
-    categories.forEach(cat => {
-        const option = document.createElement("option");
-        option.value = cat;
-        option.textContent = cat;
-        select.appendChild(option);
-    });
+    })
+    .catch(error => console.error("Erreur chargement compétences :", error));
 }
 
-function displaySkills(showAll) {
-    let filtered = allSkills;
-    const filterValue = document.getElementById("skillFilter") ? document.getElementById("skillFilter").value : "";
-    if (filterValue) {
-        filtered = filtered.filter(skill => skill.category === filterValue);
+// Charger et afficher le graphique en barres des projets
+function loadProjectStatusChart() {
+    fetch("../api/dashboard.php?action=getProjectStatusCounts")
+    .then(response => response.json())
+    .then(data => {
+        let total = 0;
+        let statusCounts = { "terminé": 0, "en cours": 0, "à faire": 0 };
+        data.forEach(item => {
+            statusCounts[item.status] = parseInt(item.count);
+            total += parseInt(item.count);
+        });
+        let percentages = { "terminé": 0, "en cours": 0, "à faire": 0 };
+        if (total > 0) {
+            percentages["terminé"] = ((statusCounts["terminé"] || 0) / total * 100).toFixed(0);
+            percentages["en cours"] = ((statusCounts["en cours"] || 0) / total * 100).toFixed(0);
+            percentages["à faire"] = ((statusCounts["à faire"] || 0) / total * 100).toFixed(0);
+        }
+        renderProjectStatusChart(percentages);
+    })
+    .catch(error => console.error("Erreur chargement du graphique :", error));
+}
+
+function renderProjectStatusChart(percentages) {
+    const ctx = document.getElementById("projectStatusChart").getContext("2d");
+    const isDark = document.body.classList.contains("dark-mode");
+    
+    const data = {
+        labels: ["Terminé", "En cours", "À faire"],
+        datasets: [{
+            label: "Pourcentage",
+            data: [percentages["terminé"], percentages["en cours"], percentages["à faire"]],
+            backgroundColor: ["#2ecc71", "#f1c40f", "#e74c3c"],
+            borderColor: isDark ? ["#fff", "#fff", "#fff"] : ["#27ae60", "#f39c12", "#c0392b"],
+            borderWidth: 1
+        }]
+    };
+    if (projectStatusChart) {
+        projectStatusChart.destroy();
     }
-    if (!showAll) {
-        filtered = filtered.slice(0, 3);
-    }
-    const skillsContent = document.getElementById("skillsContent");
-    skillsContent.innerHTML = "";
-    if (filtered.length === 0) {
-        skillsContent.innerHTML = "<p>Aucune compétence trouvée.</p>";
-        return;
-    }
-    filtered.forEach(skill => {
-        const li = document.createElement("p");
-        li.innerHTML = `<strong>${skill.skill_name}</strong>`;
-        skillsContent.appendChild(li);
+    projectStatusChart = new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) { return value + "%" },
+                        color: isDark ? "#fff" : "#000"
+                    },
+                    grid: {
+                        color: isDark ? "#fff" : "#ccc"
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: isDark ? "#fff" : "#000"
+                    },
+                    grid: {
+                        color: isDark ? "#fff" : "#ccc"
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ": " + context.parsed.y + "%";
+                        }
+                    }
+                },
+                legend: {
+                    labels: {
+                        color: isDark ? "#fff" : "#000"
+                    }
+                }
+            }
+        }
     });
 }

@@ -1,0 +1,139 @@
+/* Mode sombre global */
+body.dark-mode {
+    background-color: #333;
+    color: #fff;
+}
+
+/* Forcer la couleur blanche sur les éléments de texte courants */
+body.dark-mode p,
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode span,
+body.dark-mode a,
+body.dark-mode li,
+body.dark-mode label,
+body.dark-mode button {
+    color: #fff !important;
+}
+
+/* Sidebar */
+body.dark-mode .sidebar {
+    background-color: #222;
+}
+body.dark-mode .sidebar a {
+    color: #ccc;
+}
+
+/* Main Content */
+body.dark-mode .main-content {
+    background-color: #444;
+}
+
+/* Tableaux */
+body.dark-mode table {
+    background-color: #444;
+    color: #fff;
+    border-collapse: collapse;
+}
+body.dark-mode table th,
+body.dark-mode table td {
+    border: 1px solid #555;
+    padding: 8px;
+}
+body.dark-mode table thead {
+    background-color: #555;
+}
+
+/* Modal (Ajout/Modification de Projet) */
+body.dark-mode #projectModal .modal-content {
+    background-color: #444;
+    color: #fff;
+    border: 1px solid #555;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+body.dark-mode #projectModal input,
+body.dark-mode #projectModal textarea,
+body.dark-mode #projectModal select {
+    background-color: #555;
+    color: #fff;
+    border: 1px solid #666;
+    padding: 8px;
+    border-radius: 4px;
+}
+body.dark-mode #projectModal label {
+    color: #ddd;
+}
+body.dark-mode #projectModal button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+body.dark-mode #projectModal button:hover {
+    background-color: #0056b3;
+}
+
+/* Bouton "Ajouter un Projet" */
+body.dark-mode #addProjectBtn {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+body.dark-mode #addProjectBtn:hover {
+    background-color: #0056b3;
+}
+
+/* Placeholders */
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: #ccc;
+}
+
+/* Bouton du mode sombre */
+#darkModeToggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+#darkModeToggle:hover {
+    background-color: #0056b3;
+}
+
+/* Style pour le fond de la modal (overlay), si utilisé */
+body.dark-mode .modal {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+body.dark-mode .card {
+    background-color: #444 !important;
+    color: #fff !important;
+    border: 1px solid #777 !important;
+}
+
+body.dark-mode .extra-info {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+}

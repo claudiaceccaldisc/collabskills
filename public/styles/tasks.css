@@ -6,7 +6,6 @@
     font-weight: normal;
     font-style: normal;
 }
-
 @font-face {
     font-family: 'Poppins';
     src: url('../fonts/Poppins-Bold.woff2') format('woff2'),
@@ -15,7 +14,7 @@
     font-style: normal;
 }
 
-/* Styles spécifiques à la page Tasks */
+/* Styles généraux */
 body {
     font-family: 'Poppins', sans-serif;
     background-color: #f4f5f7;
@@ -25,23 +24,21 @@ body {
 
 /* Zone de contenu principale ajustée pour la sidebar */
 .main-content {
-    margin-left: 250px; /* Début du contenu à 250px */
-    width: calc(100% - 250px); /* Largeur restante */
+    margin-left: 250px;
+    width: calc(100% - 250px);
     transition: margin-left 0.3s ease, width 0.3s ease;
 }
-
 .sidebar.collapsed ~ .main-content {
     margin-left: 80px;
     width: calc(100% - 80px);
 }
 
-
-/* Styles pour header, main et footer */
+/* Header, main et footer */
 header, main, footer {
     padding: 20px;
 }
 
-/* Style pour les cards */
+/* Style des cards */
 .card {
     background: white;
     border-radius: 12px;
@@ -50,12 +47,9 @@ header, main, footer {
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
     transition: transform 0.2s ease-in-out;
 }
-
 .card:hover {
     transform: translateY(-3px);
 }
-
-/* Style pour le titre du formulaire avec icône */
 .card h2 {
     font-size: 24px;
     color: #333;
@@ -63,20 +57,18 @@ header, main, footer {
     display: flex;
     align-items: center;
 }
-
 .form-icon {
     font-size: 28px;
     margin-right: 10px;
 }
 
-/* Formulaire */
+/* Styles du formulaire */
 form label {
     display: block;
     margin-top: 10px;
     font-weight: 600;
     color: #555;
 }
-
 form input, form select, form textarea {
     width: 100%;
     padding: 10px;
@@ -85,8 +77,8 @@ form input, form select, form textarea {
     border: 2px solid #ccc;
     border-radius: 8px;
     transition: border 0.3s ease-in-out;
+    box-sizing: border-box;
 }
-
 form input:focus, form select:focus, form textarea:focus {
     border-color: #5A8DEE;
     outline: none;
@@ -101,77 +93,76 @@ button {
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.3s ease-in-out;
+    margin-right: 5px;
 }
-
 button:hover {
     background: #ff3b3b;
 }
 
+/* Boutons d'action dans le tableau */
+.action-btn {
+    padding: 5px 10px;
+    font-size: 0.9em;
+    margin: 2px;
+    border-radius: 5px;
+}
+.edit-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
 /* Tableau des tâches */
+.table-responsive {
+    overflow-x: auto;
+}
 table {
     width: 100%;
     border-collapse: collapse;
 }
-
 table th, table td {
     padding: 12px;
     border: 1px solid #ddd;
     text-align: left;
 }
-
 table th {
     background-color: #5A8DEE;
     color: white;
 }
 
-/* Curseur pointer sur les lignes cliquables */
-#tasksTableBody tr {
-    cursor: pointer;
+/* Conteneur en bas (formulaire et diagramme) */
+.bottom-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.form-card, .chart-card {
+    flex: 1;
+    min-width: 300px;
+}
+.chart-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.chart-card canvas {
+    max-width: 100%;
 }
 
-/* Modal pour le résumé des tâches */
-.modal {
-    display: none;
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 600px;
-    background: rgba(255,255,255,0.9); /* Effet transparent */
-    border-radius: 10px;
-    box-shadow: 0px 10px 20px rgba(0,0,0,0.2);
-    z-index: 2000;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.modal-content.summary-content {
-    padding: 20px;
-}
-
-/* Bouton de fermeture du modal */
-.modal .close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 22px;
-    color: #e74c3c;
-    cursor: pointer;
-}
-
-
-/* 🔄 Responsive pour le contenu (hors sidebar) */
+/* Responsive */
 @media (max-width: 768px) {
     .main-content {
         margin-left: 100px;
         width: calc(100% - 100px);
     }
-    .card-container {
-        grid-template-columns: 1fr;
+    table th, table td {
+        padding: 8px;
+        font-size: 0.9em;
+    }
+    .bottom-container {
+        flex-direction: column;
     }
 }

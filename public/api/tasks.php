@@ -28,6 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action'])) {
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
     }
+    else if ($action === 'getTaskCounts') {
+        // Récupérer le nombre de tâches par statut pour l'utilisateur connecté
+        $stmt = $pdo->prepare("SELECT status, COUNT(*) as count FROM tasks WHERE assigned_to = ? GROUP BY status");
+        $stmt->execute([$user_id]);
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        exit;
+    }
 }
 
 // Traitement des requêtes POST
@@ -52,6 +59,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             echo json_encode(["message" => "Tâche ajoutée avec succès"]);
         } else {
             echo json_encode(["error" => "Erreur lors de l'ajout de la tâche"]);
+        }
+        exit;
+    }
+    else if ($action === 'updateTask') {
+        $id          = trim($input['id'] ?? '');
+        $project_id  = trim($input['project_id'] ?? '');
+        $title       = trim($input['title'] ?? '');
+        $description = trim($input['description'] ?? '');
+        $due_date    = trim($input['due_date'] ?? '');
+        $status      = trim($input['status'] ?? '');
+
+        if (empty($id) || empty($project_id) || empty($title) || empty($due_date) || empty($status)) {
+            echo json_encode(["error" => "Tous les champs sont requis pour la mise à jour"]);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("UPDATE tasks SET project_id = ?, title = ?, description = ?, due_date = ?, status = ? WHERE id = ? AND assigned_to = ?");
+        if ($stmt->execute([$project_id, $title, $description, $due_date, $status, $id, $user_id])) {
+            echo json_encode(["message" => "Tâche mise à jour avec succès"]);
+        } else {
+            echo json_encode(["error" => "Erreur lors de la mise à jour de la tâche"]);
+        }
+        exit;
+    }
+    else if ($action === 'deleteTask') {
+        $id = trim($input['id'] ?? '');
+        if (empty($id)) {
+            echo json_encode(["error" => "ID de tâche requis pour la suppression"]);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("DELETE FROM tasks WHERE id = ? AND assigned_to = ?");
+        if ($stmt->execute([$id, $user_id])) {
+            echo json_encode(["message" => "Tâche supprimée avec succès"]);
+        } else {
+            echo json_encode(["error" => "Erreur lors de la suppression de la tâche"]);
         }
         exit;
     }

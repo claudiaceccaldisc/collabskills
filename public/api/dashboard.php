@@ -1,6 +1,9 @@
 <?php
 require __DIR__ . '/config.php';
 header("Content-Type: application/json");
+// Désactiver le cache pour forcer le rafraîchissement
+header("Cache-Control: no-cache, must-revalidate");
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -18,21 +21,26 @@ if (!$action) {
 
 switch ($action) {
     case 'getProjects':
-        // Récupérer les projets créés par l'utilisateur avec le statut 'en cours'
-        $stmt = $pdo->prepare("SELECT id, name, description, status, deadline FROM projects WHERE created_by = ? AND status = 'en cours'");
+        // Retourner le dernier projet de l'utilisateur
+        $stmt = $pdo->prepare("SELECT id, name, description, status, deadline FROM projects WHERE created_by = ? ORDER BY id DESC LIMIT 1");
         $stmt->execute([$user_id]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
     
     case 'getTasks':
-        // Récupérer les tâches assignées à l'utilisateur et non terminées
-        $stmt = $pdo->prepare("SELECT id, title, description, status, due_date FROM tasks WHERE assigned_to = ? AND status != 'terminé'");
-        $stmt->execute([$user_id]);
+        // Retourner la dernière tâche non terminée de l'utilisateur (ou liée à ses projets)
+        $stmt = $pdo->prepare("
+            SELECT t.id, t.title, t.description, t.status, t.due_date, p.name AS project_name, p.id AS project_id
+            FROM tasks t
+            JOIN projects p ON t.project_id = p.id
+            WHERE (t.assigned_to = ? OR p.created_by = ?) AND t.status != 'terminé'
+            ORDER BY t.id DESC LIMIT 1
+        ");
+        $stmt->execute([$user_id, $user_id]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
     
     case 'getCollaborators':
-        // Récupérer les collaborateurs travaillant sur des projets communs
         $stmt = $pdo->prepare("
             SELECT DISTINCT u.id, u.first_name, u.last_name
             FROM users u
@@ -41,24 +49,25 @@ switch ($action) {
                 SELECT project_id FROM tasks WHERE assigned_to = ?
             )
             AND u.id != ?
+            ORDER BY u.id DESC
         ");
         $stmt->execute([$user_id, $user_id]);
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         break;
-    
-        case 'getSkills':
-            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-                $stmt = $pdo->prepare("SELECT id, skill_name, category FROM skills WHERE user_id = ?");
-                $stmt->execute([$_SESSION['user_id']]);
-                echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
-                exit;
-            } else {
-                echo json_encode(["error" => "Méthode non autorisée pour cette action"]);
-                exit;
-            }
-            break;
+
+    case 'getSkills':
+        $stmt = $pdo->prepare("SELECT id, skill_name, category FROM skills WHERE user_id = ? ORDER BY id DESC");
+        $stmt->execute([$user_id]);
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        break;
         
-    
+    case 'getProjectStatusCounts':
+        // Retourner le nombre de projets par statut pour l'utilisateur
+        $stmt = $pdo->prepare("SELECT status, COUNT(*) as count FROM projects WHERE created_by = ? GROUP BY status");
+        $stmt->execute([$user_id]);
+        echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        break;
+
     default:
         echo json_encode(["error" => "Action non reconnue"]);
         break;
